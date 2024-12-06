@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, ExternalLink } from 'lucide-react';
+
 import { 
   Bug, Upload, Camera, AlertCircle, Loader2, 
   Microscope, Shield, Sprout, Droplets, 

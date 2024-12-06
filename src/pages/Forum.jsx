@@ -139,7 +139,7 @@ const Forum = () => {
       Farmer 2: ${farmer2.name} from ${farmer2.village} with ${farmer2.experience} years of experience
 
       Make their responses authentic, including local context, traditional knowledge, and practical experience.
-      Each response should be 2-3 sentences.
+      Each response should be 2-3 sentences in english.
 
       Question: "${userQuery}"
 

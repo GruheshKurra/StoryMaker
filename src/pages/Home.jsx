@@ -2,24 +2,27 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  Leaf, 
-  Bug, 
-  MessageCircle, 
-  FileText, 
-  ChevronRight, 
-  TrendingUp 
+  Leaf, Bug, Heart, 
+  FileText, ChevronRight, TrendingUp,
+  FlaskConical, MapPin, MessageCircle
 } from 'lucide-react';
 
-const FeatureCard = ({ Icon, title, description, link }) => (
+const FeatureCard = ({ Icon, title, description, link, isHighlighted = false }) => (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     whileHover={{ scale: 1.02 }}
-    className="bg-green-900/40 backdrop-blur-sm p-6 rounded-xl ring-1 ring-green-800/50 hover:bg-green-800/40 transition-all duration-300"
+    className={`${
+      isHighlighted 
+        ? 'bg-green-600/20 ring-2 ring-green-500/50' 
+        : 'bg-green-900/40 ring-1 ring-green-800/50'
+    } backdrop-blur-sm p-6 rounded-xl hover:bg-green-800/40 transition-all duration-300`}
   >
-    <div className="bg-green-800/50 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-      <Icon className="w-6 h-6 text-green-400" />
+    <div className={`${
+      isHighlighted ? 'bg-green-500' : 'bg-green-800/50'
+    } w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
+      <Icon className={`w-6 h-6 ${isHighlighted ? 'text-green-900' : 'text-green-400'}`} />
     </div>
     <h3 className="text-xl font-semibold text-green-300 mb-2">{title}</h3>
     <p className="text-green-100/90 mb-4">{description}</p>
@@ -68,7 +71,7 @@ const Home = () => {
             transition={{ delay: 0.3 }}
             className="text-xl text-green-200 mb-8 max-w-2xl mx-auto"
           >
-            Leverage AI technology for plant analysis, pest detection, price predictions, and connect with other farmers.
+            Empowering farmers with AI technology for plant analysis, pest detection, and community support.
           </motion.p>
           
           <motion.div
@@ -78,16 +81,18 @@ const Home = () => {
             className="flex flex-wrap justify-center gap-4"
           >
             <Link 
-              to="/plant-analysis"
-              className="bg-green-500 text-green-950 px-6 py-3 rounded-lg font-semibold hover:bg-green-400 transition-colors shadow-lg hover:shadow-xl"
+              to="/farmer-support"
+              className="bg-green-500 text-green-950 px-6 py-3 rounded-lg font-semibold hover:bg-green-400 transition-colors shadow-lg hover:shadow-xl flex items-center space-x-2"
             >
-              Analyze Plant
+              <Heart className="w-5 h-5" />
+              <span>Support Farmers</span>
             </Link>
             <Link 
-              to="/price-prediction"
-              className="bg-green-900 text-green-100 px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition-colors ring-1 ring-green-700 shadow-lg hover:shadow-xl"
+              to="/plant-analysis"
+              className="bg-green-900 text-green-100 px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition-colors ring-1 ring-green-700 shadow-lg hover:shadow-xl flex items-center space-x-2"
             >
-              Check Prices
+              <Leaf className="w-5 h-5" />
+              <span>Analyze Plants</span>
             </Link>
           </motion.div>
         </div>
@@ -102,7 +107,23 @@ const Home = () => {
       {/* Features Section */}
       <section className="py-16 px-4 bg-green-950/50 relative">
         <div className="max-w-7xl mx-auto">
+          <motion.h2
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl font-bold text-green-300 text-center mb-12"
+          >
+            Comprehensive Farming Solutions
+          </motion.h2>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <FeatureCard 
+              Icon={Heart}
+              title="Farmer Support"
+              description="Join our community in supporting farmers through verified cases and transparent donation tracking."
+              link="/farmer-support"
+              isHighlighted={true}
+            />
             <FeatureCard 
               Icon={Leaf}
               title="Plant Analysis"
@@ -122,10 +143,10 @@ const Home = () => {
               link="/price-prediction"
             />
             <FeatureCard 
-              Icon={MessageCircle}
-              title="Farmers' Forum"
-              description="Connect with experienced farmers, share knowledge, and get advice for your farming queries."
-              link="/forum"
+              Icon={MapPin}
+              title="Land Lease"
+              description="Find and lease agricultural land in your region with verified listings and fair negotiations."
+              link="/land-lease"
             />
             <FeatureCard 
               Icon={FileText}
@@ -139,6 +160,63 @@ const Home = () => {
         {/* Additional Decorative Element */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-800/50 to-transparent" />
+        </div>
+      </section>
+
+      {/* Community Support Section */}
+      <section className="py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-green-900/40 rounded-xl p-8 ring-1 ring-green-800/50"
+          >
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="md:w-1/2">
+                <h2 className="text-3xl font-bold text-green-300 mb-4">Join Our Farming Community</h2>
+                <p className="text-green-200 mb-6">
+                  Connect with experienced farmers, share knowledge, and contribute to sustainable agriculture. Together, we can make a difference.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    to="/forum"
+                    className="bg-green-700 text-green-100 px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center space-x-2"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    <span>Join Forum</span>
+                  </Link>
+                  <Link
+                    to="/farmer-support"
+                    className="bg-green-900 text-green-100 px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition-colors ring-1 ring-green-700 flex items-center space-x-2"
+                  >
+                    <Heart className="w-5 h-5" />
+                    <span>Support Others</span>
+                  </Link>
+                </div>
+              </div>
+              <div className="md:w-1/2 flex justify-center">
+                <div className="grid grid-cols-2 gap-4 max-w-sm">
+                  <div className="bg-green-800/30 p-4 rounded-lg text-center">
+                    <h3 className="text-3xl font-bold text-green-300 mb-2">500+</h3>
+                    <p className="text-green-200">Active Farmers</p>
+                  </div>
+                  <div className="bg-green-800/30 p-4 rounded-lg text-center">
+                    <h3 className="text-3xl font-bold text-green-300 mb-2">₹2M+</h3>
+                    <p className="text-green-200">Support Raised</p>
+                  </div>
+                  <div className="bg-green-800/30 p-4 rounded-lg text-center">
+                    <h3 className="text-3xl font-bold text-green-300 mb-2">200+</h3>
+                    <p className="text-green-200">Success Stories</p>
+                  </div>
+                  <div className="bg-green-800/30 p-4 rounded-lg text-center">
+                    <h3 className="text-3xl font-bold text-green-300 mb-2">50+</h3>
+                    <p className="text-green-200">Expert Advisors</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
     </div>
