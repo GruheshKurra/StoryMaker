@@ -14,7 +14,8 @@ import {
   TrendingUp,
   MapPin,
   LayoutGrid,
-  Heart
+  Heart,
+  Wrench
 } from 'lucide-react';
 
 const DropdownMenu = ({ title, items, isOpen, onClick }) => {
@@ -77,7 +78,8 @@ const Navbar = () => {
       title: 'Services',
       items: [
         { path: '/price-prediction', icon: TrendingUp, label: 'Price Prediction' },
-        { path: '/land-lease', icon: MapPin, label: 'Land Lease' }
+        { path: '/land-lease', icon: MapPin, label: 'Land Lease' },
+        { path: '/equipment-lease', icon: Wrench, label: 'Equipment Lease' }
       ]
     },
     community: {

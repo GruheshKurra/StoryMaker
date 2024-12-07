@@ -11,6 +11,7 @@ import VegetablePricePrediction from './pages/VegetablePricePrediction';
 import LandLease from './pages/LandLease';
 import SoilAnalysis from './pages/SoilAnalysis';
 import FarmerSupport from './pages/FarmerSupport';
+import EquipmentLease from './pages/EquipmentLease';
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
             <Route path="/price-prediction" element={<VegetablePricePrediction />} />
             <Route path="/farmer-support" element={<FarmerSupport />} />
             <Route path="/land-lease" element={<LandLease />} />
+            <Route path="/equipment-lease" element={<EquipmentLease />} />
             <Route path="/forum" element={<Forum />} />
             <Route path="/news" element={<News />} />
           </Routes>
