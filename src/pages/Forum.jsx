@@ -162,7 +162,7 @@ const Forum = () => {
       }`;
 
       const response = await fetch(
-        'https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=AIzaSyCyozrcOfWc4Q4fLCfJFtc5-lF5VTcwmOQ',
+        'https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=AIzaSyD7Gv1Nefuo5TipsBrHYvjwuIaKkh2WbtY',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
