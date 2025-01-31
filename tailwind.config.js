@@ -10,6 +10,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Helvetica', 'Arial', 'sans-serif'],
+        serif: ['Merriweather', 'serif'],
       },
       typography: {
         DEFAULT: {
@@ -17,34 +18,47 @@ export default {
             color: '#E2E8F0',
             maxWidth: 'none',
             h1: {
-              color: '#A7F3D0',
+              color: '#E2E8F0',
             },
             h2: {
-              color: '#A7F3D0',
+              color: '#E2E8F0',
             },
             h3: {
-              color: '#A7F3D0',
+              color: '#E2E8F0',
             },
             h4: {
-              color: '#A7F3D0',
+              color: '#E2E8F0',
             },
             strong: {
-              color: '#A7F3D0',
+              color: '#E2E8F0',
             },
             a: {
-              color: '#34D399',
+              color: '#60A5FA',
               '&:hover': {
-                color: '#6EE7B7',
+                color: '#93C5FD',
               },
             },
-            code: {
-              color: '#A7F3D0',
-            },
-            blockquote: {
-              color: '#A7F3D0',
-              borderLeftColor: '#059669',
-            },
           },
+        },
+      },
+      animation: {
+        'gradient': 'gradient 8s linear infinite',
+        'float': 'float 6s ease-in-out infinite',
+      },
+      keyframes: {
+        gradient: {
+          '0%, 100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left center'
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'right center'
+          },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
         },
       },
     },

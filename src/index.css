@@ -9,7 +9,7 @@
   }
   
   body {
-    @apply bg-green-950 text-green-50;
+    @apply bg-gray-950 text-gray-50;
   }
 }
 
@@ -19,13 +19,22 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-green-950;
+  @apply bg-gray-950;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-green-800 rounded-full;
+  @apply bg-gray-800 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-green-700;
+  @apply bg-gray-700;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
