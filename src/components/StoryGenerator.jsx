@@ -20,7 +20,7 @@ import {
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { Loader } from './Loader';
 
-const API_KEY = 'AIzaSyD7Gv1Nefuo5TipsBrHYvjwuIaKkh2WbtY';
+const API_KEY = 'AIzaSyAD1IsW4iMD1HnZjP1MYHb5Qb8CqwOLFXs';
 const UNSPLASH_ACCESS_KEY = 's4RqP4K0kv3qWVGS46YdXuBqKccITcb5xRMmtW2gkys';
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
