@@ -1,13 +1,92 @@
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
-import { Book, ChevronRight, ChevronLeft, Volume2, VolumeX, Sparkles, RefreshCw, Wand2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Book, 
+  ChevronRight, 
+  ChevronLeft, 
+  Volume2, 
+  VolumeX, 
+  Sparkles, 
+  RefreshCw, 
+  Wand2,
+  BookOpen,
+  Stars,
+  Moon,
+  Sun,
+  Wind,
+  Cloud,
+  Palette
+} from 'lucide-react';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { Loader } from './Loader';
 
 const API_KEY = 'AIzaSyD7Gv1Nefuo5TipsBrHYvjwuIaKkh2WbtY';
 const UNSPLASH_ACCESS_KEY = 's4RqP4K0kv3qWVGS46YdXuBqKccITcb5xRMmtW2gkys';
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const FloatingParticle = ({ delay = 0 }) => (
+  <motion.div
+    className="absolute w-1 h-1 bg-white rounded-full"
+    animate={{
+      y: [-20, -40, -20],
+      opacity: [0, 1, 0],
+      scale: [0, 1, 0],
+    }}
+    transition={{
+      duration: 2,
+      delay,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }}
+  />
+);
+
+const MagicSparkles = () => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    {[...Array(20)].map((_, i) => (
+      <FloatingParticle key={i} delay={i * 0.1} />
+    ))}
+  </div>
+);
+
+const BackgroundEffects = () => (
+  <>
+    <div className="fixed inset-0 bg-gradient-to-b from-gray-900 via-blue-900/20 to-gray-900" />
+    <div className="fixed inset-0 bg-[url('/stars.png')] opacity-50 animate-twinkle" />
+    <div className="fixed inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-blue-500/10 animate-gradient" />
+  </>
+);
+
+const ThemeSelector = ({ theme, setTheme }) => {
+  const themes = [
+    { id: 'fantasy', icon: Stars, label: 'Fantasy' },
+    { id: 'mystery', icon: Moon, label: 'Mystery' },
+    { id: 'adventure', icon: Sun, label: 'Adventure' },
+    { id: 'fairytale', icon: Wind, label: 'Fairytale' },
+  ];
+
+  return (
+    <div className="flex gap-2 mb-4">
+      {themes.map(({ id, icon: Icon, label }) => (
+        <motion.button
+          key={id}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setTheme(id)}
+          className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+            theme === id 
+              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' 
+              : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 border border-gray-700'
+          }`}
+        >
+          <Icon className="w-4 h-4" />
+          <span className="text-sm">{label}</span>
+        </motion.button>
+      ))}
+    </div>
+  );
+};
 
 export const StoryGenerator = () => {
   const [prompt, setPrompt] = useState('');
@@ -19,7 +98,9 @@ export const StoryGenerator = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [direction, setDirection] = useState(0);
   const [promptTags, setPromptTags] = useState([]);
+  const [theme, setTheme] = useState('fantasy');
   const speechSynthesisRef = useRef(null);
+  const controls = useAnimation();
 
   useEffect(() => {
     if (story) {
@@ -90,12 +171,10 @@ export const StoryGenerator = () => {
 
   const generateImagesForStory = async (pages, tags) => {
     const images = [];
-    
     for (let i = 0; i < pages.length; i++) {
       const image = await fetchImageForPage(tags);
       images.push(image);
     }
-    
     return images.filter(Boolean);
   };
 
@@ -109,7 +188,7 @@ export const StoryGenerator = () => {
           body: JSON.stringify({
             contents: [{
               role: "user",
-              parts: [{ text: `Create a magical story about: ${prompt}. Divide it into exactly 5 paragraphs. Make it fantasy-themed with vivid descriptions.` }]
+              parts: [{ text: `Create a ${theme} story about: ${prompt}. Divide it into exactly 5 paragraphs. Make it magical with vivid descriptions.` }]
             }],
             generationConfig: {
               temperature: 0.9,
@@ -139,7 +218,7 @@ export const StoryGenerator = () => {
     }
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.0;
+    utterance.rate = 0.9;
     utterance.pitch = 1.0;
 
     utterance.onend = () => {
@@ -152,12 +231,13 @@ export const StoryGenerator = () => {
     setIsPlaying(true);
   };
 
-  const handlePageChange = (newDirection) => {
+  const handlePageChange = async (newDirection) => {
     if (speechSynthesisRef.current) {
       speechSynthesis.cancel();
       speechSynthesisRef.current = null;
       setIsPlaying(false);
     }
+    
     setDirection(newDirection);
     setCurrentPage(prev => {
       if (newDirection === 1 && prev < pages.length - 1) return prev + 1;
@@ -195,217 +275,200 @@ export const StoryGenerator = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-      <AnimatePresence mode="wait">
-        {!story ? (
-          <motion.div
-            key="prompt"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-gradient-to-b from-gray-800/80 to-gray-900/80 backdrop-blur-xl rounded-3xl p-6 md:p-16 shadow-2xl border border-gray-700"
-          >
-            <div className="flex flex-col items-center justify-center space-y-8 md:space-y-10">
-              <motion.div
-                className="relative"
-                animate={{ 
-                  rotate: [0, 360],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{ 
-                  rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                  scale: { duration: 3, repeat: Infinity, ease: "easeInOut" }
-                }}
-              >
-                <div className="absolute inset-0 bg-blue-500/30 blur-2xl rounded-full" />
-                <Wand2 className="w-20 h-20 md:w-32 md:h-32 text-blue-400 relative z-10" />
-              </motion.div>
+    <div className="min-h-screen relative overflow-hidden">
+      <BackgroundEffects />
+      
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        <AnimatePresence mode="wait">
+          {!story ? (
+            <motion.div
+              key="prompt"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="max-w-2xl mx-auto"
+            >
+              <div className="bg-gray-900/40 backdrop-blur-xl rounded-2xl p-8 border border-gray-800/50 shadow-xl">
+                <div className="flex flex-col items-center space-y-8">
+                  <motion.div
+                    className="relative"
+                    animate={{ 
+                      rotate: [0, 360],
+                      scale: [1, 1.1, 1]
+                    }}
+                    transition={{ 
+                      rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                      scale: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-blue-500/30 blur-xl rounded-full" />
+                    <div className="relative z-10 bg-gradient-to-r from-blue-500 to-purple-500 p-4 rounded-full">
+                      <Wand2 className="w-12 h-12 text-white" />
+                    </div>
+                    <MagicSparkles />
+                  </motion.div>
 
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent text-center">
-                Enchanted Tales
-              </h1>
-
-              <div className="text-xl md:text-2xl text-gray-400 text-center max-w-2xl">
-                Whisper your wishes, and watch as AI weaves a magical tale just for you...
-              </div>
-
-              <form onSubmit={handleSubmit} className="w-full max-w-2xl space-y-6 md:space-y-8">
-                <div className="relative group">
-                  <textarea
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Once upon a time..."
-                    className="w-full p-6 md:p-8 bg-gray-900/50 border-2 border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/50 focus:border-blue-500 text-gray-100 placeholder-gray-500 text-lg md:text-xl transition-all duration-300 hover:border-blue-500/50"
-                    rows={4}
-                  />
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-6 md:py-8 px-8 md:px-10 rounded-2xl text-xl md:text-2xl font-medium shadow-xl transition-all duration-300 hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-4"
-                >
-                  {loading ? (
-                    <>
-                      <Loader />
-                      <span>Weaving Your Tale...</span>
-                    </>
-                  ) : (
-                    <>
-                      Begin the Magic
-                      <Sparkles className="w-6 h-6 md:w-8 md:h-8" />
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="story"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            className="bg-gradient-to-b from-gray-800/80 to-gray-900/80 backdrop-blur-xl rounded-3xl p-6 md:p-16 shadow-2xl border border-gray-700"
-          >
-            <div className="min-h-[600px] md:min-h-[800px] flex flex-col">
-              <div className="flex justify-between items-center mb-8 md:mb-12">
-                <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  {prompt}
-                </h2>
-                <div className="text-lg md:text-xl text-gray-400 font-medium">
-                  Page {currentPage + 1} of {pages.length}
-                </div>
-              </div>
-
-              <div className="flex flex-col md:flex-row gap-8 md:gap-16 flex-grow">
-                <motion.div 
-                  className="w-full md:w-1/2"
-                  initial={{ opacity: 0, x: direction >= 0 ? 100 : -100 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: direction >= 0 ? -100 : 100 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <div className="md:sticky md:top-8">
-                    {pageImages[currentPage] && (
-                      <motion.div 
-                        className="rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-700 relative group"
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <motion.img 
-                          key={pageImages[currentPage].url}
-                          src={pageImages[currentPage].url} 
-                          alt={`Story Illustration ${currentPage + 1}`} 
-                          className="w-full h-[300px] md:h-[600px] object-cover transition-transform duration-300 group-hover:scale-105"
-                          initial={{ scale: 1.1 }}
-                          animate={{ scale: 1 }}
-                          transition={{ duration: 0.5 }}
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                          <div className="flex flex-wrap gap-2">
-                            {pageImages[currentPage].tags.map((tag, i) => (
-                              <span key={i} className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-sm">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
+                  <div className="space-y-4 text-center">
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                      Enchanted Tales
+                    </h1>
+                    <p className="text-lg text-gray-300">
+                      Whisper your wishes, and watch as magic unfolds...
+                    </p>
                   </div>
-                </motion.div>
 
-                <motion.div 
-                  className="w-full md:w-1/2"
-                  initial={{ opacity: 0, x: direction >= 0 ? 100 : -100 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: direction >= 0 ? -100 : 100 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <div className="bg-gray-800/30 p-6 md:p-10 rounded-3xl border border-gray-700 shadow-xl">
-                    <div className="text-xl md:text-2xl text-gray-200 leading-relaxed font-serif">
-                    {pages[currentPage]}
+                  <ThemeSelector theme={theme} setTheme={setTheme} />
+
+                  <form onSubmit={handleSubmit} className="w-full space-y-6">
+                    <div className="relative group">
+                      <textarea
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        placeholder="Once upon a time..."
+                        className="w-full p-6 bg-gray-900/90 rounded-lg border border-gray-700/50 focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-gray-100 placeholder-gray-500 text-lg transition-all duration-300"
+                        rows={4}
+                      />
+                    </div>
+
+                    <motion.button
+                      type="submit"
+                      disabled={loading}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 py-4 rounded-xl text-white text-lg font-medium shadow-xl transition-colors flex items-center justify-center gap-3"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader />
+                          <span>Weaving Your Tale...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Begin the Magic</span>
+                          <Sparkles className="w-5 h-5" />
+                        </>
+                      )}
+                    </motion.button>
+                  </form>
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="story"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              className="max-w-6xl mx-auto"
+            >
+              <div className="bg-gray-900/40 backdrop-blur-xl rounded-2xl border border-gray-800/50 shadow-xl overflow-hidden">
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                      {prompt}
+                    </h2>
+                    <div className="flex items-center gap-4">
+                      <span className="text-lg text-gray-400">
+                        {currentPage + 1} of {pages.length}
+                      </span>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => speak(pages[currentPage])}
+                        className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-full transition-colors"
+                      >
+                        {isPlaying ? (
+                          <VolumeX className="w-5 h-5" />
+                        ) : (
+                          <Volume2 className="w-5 h-5" />
+                        )}
+                      </motion.button>
                     </div>
                   </div>
-                </motion.div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {pageImages[currentPage] && (
+                      <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-300" />
+                        <div className="relative rounded-xl overflow-hidden aspect-video">
+                          <img
+                            src={pageImages[currentPage].url}
+                            alt="Story Illustration"
+                            className="w-full h-full object-cover transform group-hover:scale-105 transition duration-500"
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                            <div className="flex flex-wrap gap-2">
+                              {pageImages[currentPage].tags.map((tag, i) => (
+                                <span 
+                                  key={i} 
+                                  className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-sm"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="bg-gray-800/30 rounded-xl p-6 border border-gray-700/50">
+                      <p className="text-lg text-gray-200 leading-relaxed font-serif">
+                        {pages[currentPage]}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-8 pt-4 border-t border-gray-700/50">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handlePageChange(-1)}
+                      disabled={currentPage === 0}
+                      className="p-2 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed rounded-full"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setStory('');
+                        setPrompt('');
+                        setPages([]);
+                        setPageImages([]);
+                        setCurrentPage(0);
+                        if (speechSynthesisRef.current) {
+                          speechSynthesis.cancel();
+                          speechSynthesisRef.current = null;
+                          setIsPlaying(false);
+                        }
+                      }}
+                      className="px-4 py-2 bg-gray-800/50 hover:bg-gray-800 text-gray-300 rounded-lg flex items-center gap-2"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      <span>New Story</span>
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handlePageChange(1)}
+                      disabled={currentPage === pages.length - 1}
+                      className="p-2 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed rounded-full"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </motion.button>
+                  </div>
+                </div>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-              <div className="flex items-center justify-between mt-8 md:mt-16 pt-8 border-t border-gray-700">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handlePageChange(-1)}
-                  disabled={currentPage === 0}
-                  className="text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed p-2 md:p-3 hover:bg-gray-800/50 rounded-full transition-colors"
-                >
-                  <ChevronLeft className="w-8 h-8 md:w-12 md:h-12" />
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => speak(pages[currentPage])}
-                  className="p-4 md:p-6 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-full transition-colors flex items-center gap-3"
-                >
-                  {isPlaying ? (
-                    <>
-                      <VolumeX className="w-8 h-8 md:w-10 md:h-10" />
-                      <span className="hidden md:inline text-lg">Stop Reading</span>
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 className="w-8 h-8 md:w-10 md:h-10" />
-                      <span className="hidden md:inline text-lg">Read Aloud</span>
-                    </>
-                  )}
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handlePageChange(1)}
-                  disabled={currentPage === pages.length - 1}
-                  className="text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed p-2 md:p-3 hover:bg-gray-800/50 rounded-full transition-colors"
-                >
-                  <ChevronRight className="w-8 h-8 md:w-12 md:h-12" />
-                </motion.button>
-              </div>
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  setStory('');
-                  setPrompt('');
-                  setPages([]);
-                  setPageImages([]);
-                  setPromptTags([]);
-                  setCurrentPage(0);
-                  if (speechSynthesisRef.current) {
-                    speechSynthesis.cancel();
-                    speechSynthesisRef.current = null;
-                    setIsPlaying(false);
-                  }
-                }}
-                className="mt-8 md:mt-12 text-gray-400 hover:text-white transition-colors text-lg md:text-xl flex items-center gap-3 group"
-              >
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear", paused: true }}
-                  className="group-hover:animate-spin"
-                >
-                  <RefreshCw className="w-5 h-5 md:w-6 md:h-6" />
-                </motion.div>
-                Create Another Story
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {loading && <Loader />}
+        {loading && <Loader />}
+      </div>
     </div>
   );
 };

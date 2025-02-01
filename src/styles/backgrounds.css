@@ -1,0 +1,70 @@
+@keyframes sparkle {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes twinkle {
+  from { background-position: 0 0; }
+  to { background-position: -1000px 0; }
+}
+
+@keyframes fogFlow {
+  0% { transform: translate(-5%, -5%); }
+  100% { transform: translate(5%, 5%); }
+}
+
+.stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  animation: sparkle 5s linear infinite;
+}
+
+.stars:after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: transparent;
+  box-shadow: 
+    1744px 122px #fff,
+    134px 1321px #fff,
+    920px 1320px #fff,
+    1610px 280px #fff,
+    1722px 393px #fff,
+    1440px 195px #fff,
+    1903px 829px #fff,
+    1813px 1367px #fff,
+    1004px 575px #fff,
+    967px 862px #fff,
+    725px 1308px #fff;
+}
+
+.twinkling {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  animation: twinkle 8s linear infinite;
+  background: linear-gradient(to bottom, 
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+}
+
+.fog {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(24, 24, 36, 0.1);
+  filter: blur(20px);
+  animation: fogFlow 20s ease infinite alternate;
+}

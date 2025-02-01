@@ -8,7 +8,7 @@ export const Navbar = () => {
           <div className="flex items-center gap-3">
             <Book className="w-8 h-8 text-blue-400" />
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Enchanted Tales
+              Fable Forge
             </span>
           </div>
           
